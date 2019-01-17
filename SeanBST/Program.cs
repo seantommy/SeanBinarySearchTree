@@ -29,6 +29,7 @@ namespace SeanBST
 
             bool valueDeleted = tree.Delete(2);
             valueDeleted = tree.Delete(5);
+            valueDeleted = tree.Delete(9);
         }
     }
 }

@@ -71,42 +71,15 @@ namespace SeanBST
         /// <returns>Returns true if the value is in the tree.</returns>
         public bool Exists(T valueToFind)
         {
-            bool found = false;
-            found = ExistsRecurse(valueToFind, head);
-            return found;
-        }
-
-        private bool ExistsRecurse(T valueToFind, SeanNode<T> node)
-        {
-            bool found = false;
-
-            if (valueToFind.Equals(node.Value))
+            SeanNode<T> nodeGotten = GetNode(valueToFind, head);
+            if (nodeGotten == null)
             {
-                found = true;
-            }
-            else if (valueToFind.CompareTo(node.Value) < 0)
-            {
-                if (node.Left == null)
-                {
-                    found = false;
-                }
-                else
-                {
-                    found = ExistsRecurse(valueToFind, node.Left);
-                }
+                return false;
             }
             else
             {
-                if (node.Right == null)
-                {
-                    found = false;
-                }
-                else
-                {
-                    found = ExistsRecurse(valueToFind, node.Right);
-                }
+                return true;
             }
-            return found;
         }
 
         /// <summary>
@@ -119,83 +92,109 @@ namespace SeanBST
         public bool Delete(T valueToDelete)
         {
             bool valueDeleted = false;
-            if (head == null)
+            if (head == null) //If there's no head, there's nothing to delete.
             {
                 return valueDeleted;
-            }else if(head.Left == null && head.Right == null)
+            }else if(head.Left == null && head.Right == null) //If the head has no children, we can just delete it.
             {
                 head = null;
                 valueDeleted = true;
             }
-            else valueDeleted = DeleteRecurse(valueToDelete, head);
+            else
+            {
+                SeanNode<T> nodeToDelete = GetNode(valueToDelete, head);
+                if(nodeToDelete == null)
+                {
+                    valueDeleted = false;
+                }
+                else
+                {
+                    DeleteNode(nodeToDelete);
+                    valueDeleted = true;
+                }
+
+            }
+            
+
 
             return valueDeleted;
         }
 
-        private bool DeleteRecurse(T valueToDelete, SeanNode<T> node)
+        /// <summary>
+        /// Finds and returns a node with the given value. If no such node is found, returns null.
+        /// </summary>
+        /// <param name="valueToGet">The value you're trying to find.</param>
+        /// <param name="currentNode">The starting point for the search.</param>
+        /// <returns>Returns a node with the desired value.</returns>
+        private SeanNode<T> GetNode(T valueToGet, SeanNode<T> currentNode)
         {
-            bool valueDeleted = false;
+            SeanNode<T> nodeToReturn = null;
 
-            if (valueToDelete.Equals(node.Value))
-            { 
-                //if the node has no children, we can just delete it.
-                if (node.Left == null && node.Right == null) 
-                {
-                    if (node.Value.CompareTo(node.Parent.Value) <= 0)
-                    {
-                        node.Parent.Left = null;
-                    }
-                    else
-                    {
-                        node.Parent.Right = null;
-                    }
-                }else if(node.Left == null) //if the node has only one child, we can just pass its child to its parent.
-                {
-                    if (node.Value.CompareTo(node.Parent.Value) <= 0)
-                    {
-                        node.Parent.Left = node.Right;
-                    }
-                    else
-                    {
-                        node.Parent.Right = node.Right;
-                    }
-                    node.Right.Parent = node.Parent;
-                }
-                else if(node.Right == null) //see above comment
-                {
-                    if(node.Value.CompareTo(node.Parent.Value) <= 0)
-                    {
-                        node.Parent.Left = node.Left;
-                    }
-                    else
-                    {
-                        node.Parent.Right = node.Left;
-                    }
-                    node.Left.Parent = node.Parent;
-                }
-                else //if the node has two children, we must poll for a replacement.
-                {
-                    node.Value = PollReplacementValue(node);
-                }
-                valueDeleted = true;
-            }
-            else if(valueToDelete.CompareTo(node.Value) < 0)
+            if (valueToGet.Equals(currentNode.Value))
             {
-                if(node.Left != null)
+                nodeToReturn = currentNode;
+            }
+            else if (valueToGet.CompareTo(currentNode.Value) < 0)
+            {
+                if (currentNode.Left != null)
                 {
-                    valueDeleted = DeleteRecurse(valueToDelete, node.Left);
+                    nodeToReturn = GetNode(valueToGet, currentNode.Left);
                 }
-                
+
             }
             else
             {
-                if (node.Right != null)
+                if (currentNode.Right != null)
                 {
-                    valueDeleted = DeleteRecurse(valueToDelete, node.Right);
+                    nodeToReturn = GetNode(valueToGet, currentNode.Right);
                 }
             }
 
-            return valueDeleted;
+            return nodeToReturn;
+        }
+
+        private void DeleteNode(SeanNode<T> node)
+        {
+            //if the node has no children, we can just delete it.
+            if (node.Left == null && node.Right == null)
+            {
+                if (node.Value.CompareTo(node.Parent.Value) <= 0)
+                {
+                    node.Parent.Left = null;
+                }
+                else
+                {
+                    node.Parent.Right = null;
+                }
+            }
+            else if (node.Left == null) //if the node has only one child, we can just pass its child to its parent.
+            {
+                if (node.Value.CompareTo(node.Parent.Value) <= 0)
+                {
+                    node.Parent.Left = node.Right;
+                }
+                else
+                {
+                    node.Parent.Right = node.Right;
+                }
+                node.Right.Parent = node.Parent;
+            }
+            else if (node.Right == null) //see above comment
+            {
+                if (node.Value.CompareTo(node.Parent.Value) <= 0)
+                {
+                    node.Parent.Left = node.Left;
+                }
+                else
+                {
+                    node.Parent.Right = node.Left;
+                }
+                node.Left.Parent = node.Parent;
+            }
+            else //if the node has two children, we must poll for a replacement.
+            {
+                node.Value = PollReplacementValue(node);
+            }
         }
 
         /// <summary>
