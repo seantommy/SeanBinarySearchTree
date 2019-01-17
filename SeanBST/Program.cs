@@ -25,7 +25,10 @@ namespace SeanBST
             bool valueFound = tree.Exists(3);
             valueFound = tree.Exists(4);
             valueFound = tree.Exists(8);
+            
 
+            bool valueDeleted = tree.Delete(2);
+            valueDeleted = tree.Delete(5);
         }
     }
 }
