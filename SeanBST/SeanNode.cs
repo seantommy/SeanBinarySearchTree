@@ -14,9 +14,6 @@ namespace SeanBST
         public SeanNode<T> Right { get; set; }
 
         public SeanNode() {}
-        public SeanNode(T newValue)
-        {
-            Value = newValue;
-        }
+        public SeanNode(T newValue) {Value = newValue;}
     }
 }

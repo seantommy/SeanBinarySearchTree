@@ -10,6 +10,14 @@ namespace SeanBST
     {
 
         private SeanNode<T> head;
+        private int size;
+        public int Size
+        {
+            get
+            {
+                return size;
+            }
+        }
 
         public SeanBinaryTree() { }
 
@@ -32,13 +40,14 @@ namespace SeanBST
             {
                 AddRecurse(newEntry, head);
             }
+            size++;
         }
 
         private void AddRecurse(T newEntry, SeanNode<T> node)
         {
             if (newEntry.CompareTo(node.Value) <= 0)
             {
-                if(node.Left == null)
+                if (node.Left == null)
                 {
                     SeanNode<T> newNode = new SeanNode<T>(newEntry);
                     node.Left = newNode;
@@ -51,7 +60,7 @@ namespace SeanBST
             }
             else
             {
-                if(node.Right == null)
+                if (node.Right == null)
                 {
                     SeanNode<T> newNode = new SeanNode<T>(newEntry);
                     node.Right = newNode;
@@ -94,16 +103,18 @@ namespace SeanBST
             bool valueDeleted = false;
             if (head == null) //If there's no head, there's nothing to delete.
             {
-                return valueDeleted;
-            }else if(head.Left == null && head.Right == null) //If the head has no children, we can just delete it.
+                return false;
+            }
+            else if (head.Left == null && head.Right == null) //If the head has no children, we can just delete it.
             {
                 head = null;
                 valueDeleted = true;
+                size--;
             }
-            else
+            else //If the head has children, we must search out the desired value, delete it, and move the children
             {
                 SeanNode<T> nodeToDelete = GetNode(valueToDelete, head);
-                if(nodeToDelete == null)
+                if (nodeToDelete == null)
                 {
                     valueDeleted = false;
                 }
@@ -111,10 +122,11 @@ namespace SeanBST
                 {
                     DeleteNode(nodeToDelete);
                     valueDeleted = true;
+                    size--;
                 }
 
             }
-            
+
 
 
             return valueDeleted;
@@ -169,30 +181,46 @@ namespace SeanBST
             }
             else if (node.Left == null) //if the node has only one child, we can just pass its child to its parent.
             {
-                if (node.Value.CompareTo(node.Parent.Value) <= 0)
+                if (node.Parent != null)
                 {
-                    node.Parent.Left = node.Right;
+                    if (node.Value.CompareTo(node.Parent.Value) <= 0)
+                    {
+                        node.Parent.Left = node.Right;
+                    }
+                    else
+                    {
+                        node.Parent.Right = node.Right;
+                    }
+                    node.Right.Parent = node.Parent;
                 }
-                else
+                else //unless it's the head, in which case we make the child the head and delete the old head from its child. 
                 {
-                    node.Parent.Right = node.Right;
+                    head = node.Right;
+                    node.Right.Parent = null;
                 }
-                node.Right.Parent = node.Parent;
             }
-            else if (node.Right == null) //see above comment
+            else if (node.Right == null)
             {
-                if (node.Value.CompareTo(node.Parent.Value) <= 0)
+                if (node.Parent != null)
                 {
-                    node.Parent.Left = node.Left;
+                    if (node.Value.CompareTo(node.Parent.Value) <= 0)
+                    {
+                        node.Parent.Left = node.Left;
+                    }
+                    else
+                    {
+                        node.Parent.Right = node.Left;
+                    }
+                    node.Left.Parent = node.Parent;
                 }
                 else
                 {
-                    node.Parent.Right = node.Left;
+                    head = node.Left;
+                    node.Left.Parent = null;
                 }
-                node.Left.Parent = node.Parent;
             }
             else //if the node has two children, we must poll for a replacement.
-            {
+            {       //we don't need to worry about whether this is the head or not, because we don't actually delete it, only change its value
                 node.Value = PollReplacementValue(node);
             }
         }
@@ -209,49 +237,37 @@ namespace SeanBST
 
             SeanNode<T> currentNode = new SeanNode<T>();
             currentNode = node.Left;
-            while(currentNode.Right != null)
+            while (currentNode.Right != null)
             {
                 currentNode = currentNode.Right;
             }
 
             returnVal = currentNode.Value;
 
-            if(currentNode.Left != null)
+            if (currentNode.Left != null)
             {
                 currentNode.Value = PollReplacementValue(currentNode);
             }
-
-            if(currentNode.Value.CompareTo(currentNode.Parent.Value) <= 0)
+            else if (currentNode.Value.CompareTo(currentNode.Parent.Value) <= 0)
             {
-                if (currentNode.Left == null)
-                {
-                    currentNode.Parent.Left = null;
-                }
-                else
-                {
-                    currentNode.Parent.Left = currentNode.Left;
-                    currentNode.Left.Parent = currentNode.Parent;
-                }
+                currentNode.Parent.Left = null;
             }
             else
             {
-                if(currentNode.Left == null)
-                {
-                    currentNode.Parent.Right = null;
-                }
-                else
-                {
-                    currentNode.Parent.Right = currentNode.Left;
-                    currentNode.Left.Parent = currentNode.Parent;
-                }
+                currentNode.Parent.Right = null;
             }
 
             return returnVal;
         }
-        
+
         private void Sort()
         {
-            //if()
+            //sort option 1: read all values into an array. Sort array. Make head a new node. Build new tree using array values.
+
+            //sort option 2: 
+
+
+
 
         }
 
