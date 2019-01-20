@@ -30,11 +30,6 @@ namespace SeanBST
                 AddRecurse(newEntry, head);
             }
             Size++;
-
-            if(Math.Abs(head.LeftLayers - head.RightLayers) > 1)
-            {
-                Rebalance();
-            }
         }
 
         private void AddRecurse(T newEntry, SeanNode<T> node)
@@ -76,6 +71,11 @@ namespace SeanBST
                 {
                     node.RightLayers++;
                 }
+            }
+
+            if (Math.Abs(node.LeftLayers - node.RightLayers) > 1)
+            {
+                Rebalance(node);
             }
         }
 
@@ -202,6 +202,7 @@ namespace SeanBST
             //if the node has no children, we can just delete it.
             if (node.Left == null && node.Right == null)
             {
+                ReduceParentLayers(node);
                 if (node.Value.CompareTo(node.Parent.Value) <= 0)
                 {
                     node.Parent.Left = null;
@@ -215,6 +216,7 @@ namespace SeanBST
             {
                 if (node.Parent != null)
                 {
+                    ReduceParentLayers(node);
                     if (node.Value.CompareTo(node.Parent.Value) <= 0)
                     {
                         node.Parent.Left = node.Right;
@@ -235,6 +237,7 @@ namespace SeanBST
             {
                 if (node.Parent != null)
                 {
+                    ReduceParentLayers(node);
                     if (node.Value.CompareTo(node.Parent.Value) <= 0)
                     {
                         node.Parent.Left = node.Left;
@@ -282,20 +285,154 @@ namespace SeanBST
             }
             else if (currentNode.Value.CompareTo(currentNode.Parent.Value) <= 0)
             {
+                ReduceParentLayers(node);
                 currentNode.Parent.Left = null;
             }
             else
             {
+                ReduceParentLayers(node);
                 currentNode.Parent.Right = null;
             }
+            
 
             return returnVal;
         }
 
-        private void Rebalance()
+        private void ReduceParentLayers(SeanNode<T> node)
         {
-            
+            if(node.Parent != null)
+            {
+                if (node.Value.CompareTo(node.Parent.Value) <= 0)
+                {
+                    node.Parent.LeftLayers--;
+                    if (node.Parent.LeftLayers >= node.Parent.RightLayers)
+                    {
+                        ReduceParentLayers(node.Parent);
+                    }
+                }
+                else
+                {
+                    node.Parent.RightLayers--;
+                    if (node.Parent.RightLayers >= node.Parent.LeftLayers)
+                    {
+                        ReduceParentLayers(node.Parent);
+                    }
+                }
+            }
+        }
 
+        private void Rebalance(SeanNode<T> node)
+        {
+            if(node.LeftLayers - node.RightLayers > 1)
+            {
+                T valueToMove = node.Value;
+                DeleteNode(node);
+                AddRecurse(valueToMove, head);
+            }
+
+            if(node.RightLayers - node.LeftLayers > 1)
+            {
+                T valueToMove = node.Value;
+                DeleteNodeReverse(node);
+                AddRecurse(valueToMove, head);
+            }
+
+        }
+
+        private void DeleteNodeReverse(SeanNode<T> node)    //This is, unfortunately, the same as DeleteNode except it calls PollReverse instead
+        {
+            //if the node has no children, we can just delete it.
+            if (node.Left == null && node.Right == null)
+            {
+                ReduceParentLayers(node);
+                if (node.Value.CompareTo(node.Parent.Value) <= 0)
+                {
+                    node.Parent.Left = null;
+                    node.Parent.LeftLayers--;
+                }
+                else
+                {
+                    node.Parent.Right = null;
+                    node.Parent.RightLayers--;
+                }
+            }
+            else if (node.Left == null) //if the node has only one child, we can just pass its child to its parent.
+            {
+                if (node.Parent != null)
+                {
+                    ReduceParentLayers(node);
+                    if (node.Value.CompareTo(node.Parent.Value) <= 0)
+                    {
+                        node.Parent.Left = node.Right;
+                    }
+                    else
+                    {
+                        node.Parent.Right = node.Right;
+                    }
+                    node.Right.Parent = node.Parent;
+                }
+                else //unless it's the head, in which case we make the child the head and delete the old head from its child. 
+                {
+                    head = node.Right;
+                    node.Right.Parent = null;
+                }
+            }
+            else if (node.Right == null)
+            {
+                if (node.Parent != null)
+                {
+                    ReduceParentLayers(node);
+                    if (node.Value.CompareTo(node.Parent.Value) <= 0)
+                    {
+                        node.Parent.Left = node.Left;
+                    }
+                    else
+                    {
+                        node.Parent.Right = node.Left;
+                    }
+                    node.Left.Parent = node.Parent;
+                }
+                else
+                {
+                    head = node.Left;
+                    node.Left.Parent = null;
+                }
+            }
+            else //if the node has two children, we must poll for a replacement.
+            {       //we don't need to worry about whether this is the head or not, because we don't actually delete it, only change its value
+                node.Value = PollReplacementValueReverse(node);
+            }
+        }
+
+        private T PollReplacementValueReverse(SeanNode<T> node) //This is the same as PollReplacementValue except it goes right first, then left.
+        {
+            T returnVal = default(T);
+
+            SeanNode<T> currentNode = new SeanNode<T>();
+            currentNode = node.Right;
+            while (currentNode.Left != null)
+            {
+                currentNode = currentNode.Left;
+            }
+
+            returnVal = currentNode.Value;
+
+            if (currentNode.Right != null)
+            {
+                currentNode.Value = PollReplacementValueReverse(currentNode);
+            }
+            else if (currentNode.Value.CompareTo(currentNode.Parent.Value) <= 0)
+            {
+                ReduceParentLayers(node);
+                currentNode.Parent.Left = null;
+            }
+            else
+            {
+                ReduceParentLayers(node);
+                currentNode.Parent.Right = null;
+            }
+
+            return returnVal;
         }
 
     }
