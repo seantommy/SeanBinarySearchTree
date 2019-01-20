@@ -30,36 +30,51 @@ namespace SeanBST
                 AddRecurse(newEntry, head);
             }
             Size++;
+
+            if(Math.Abs(head.LeftLayers - head.RightLayers) > 1)
+            {
+                Rebalance();
+            }
         }
 
         private void AddRecurse(T newEntry, SeanNode<T> node)
         {
             if (newEntry.CompareTo(node.Value) <= 0)
             {
-                node.LeftLayers++;
                 if (node.Left == null)
                 {
                     SeanNode<T> newNode = new SeanNode<T>(newEntry);
                     node.Left = newNode;
                     node.Left.Parent = node;
+                    node.LeftLayers++;
                 }
                 else
                 {
                     AddRecurse(newEntry, node.Left);
                 }
+
+                if (node.Left.LeftLayers == node.LeftLayers || node.Left.RightLayers == node.LeftLayers)
+                {
+                    node.LeftLayers++;
+                }
             }
             else
             {
-                node.RightLayers++;
                 if (node.Right == null)
                 {
                     SeanNode<T> newNode = new SeanNode<T>(newEntry);
                     node.Right = newNode;
                     node.Right.Parent = node;
+                    node.RightLayers++;
                 }
                 else
                 {
                     AddRecurse(newEntry, node.Right);
+                }
+
+                if(node.Right.RightLayers == node.RightLayers || node.Right.LeftLayers == node.RightLayers)
+                {
+                    node.RightLayers++;
                 }
             }
         }
@@ -275,11 +290,6 @@ namespace SeanBST
             }
 
             return returnVal;
-        }
-
-        public void TESTFUNCTION()
-        {
-            Rebalance();
         }
 
         private void Rebalance()
