@@ -34,13 +34,17 @@ namespace SeanBST
             bool valueFound = tree.Exists(3);
             valueFound = tree.Exists(4);
             valueFound = tree.Exists(8);
-            
 
+            
             bool valueDeleted = tree.Delete(15);
             valueDeleted = tree.Delete(5);
             valueDeleted = tree.Delete(9);
             valueDeleted = tree.Delete(4);
             
+
+            List<int> treeValues = tree.Traverse();
+
+            //tree.TESTFUNCTION();
         }
     }
 }

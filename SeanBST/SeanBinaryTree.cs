@@ -8,23 +8,12 @@ namespace SeanBST
 {
     class SeanBinaryTree<T> where T : IComparable
     {
-
         private SeanNode<T> head;
-        private int size;
-        public int Size
-        {
-            get
-            {
-                return size;
-            }
-        }
-
+        public int Size { get; private set; }
+        
         public SeanBinaryTree() { }
 
-        public SeanBinaryTree(T firstEntry)
-        {
-            Add(firstEntry);
-        }
+        public SeanBinaryTree(T firstEntry){ Add(firstEntry); }
 
         /// <summary>
         /// Adds a T value to the tree
@@ -40,13 +29,14 @@ namespace SeanBST
             {
                 AddRecurse(newEntry, head);
             }
-            size++;
+            Size++;
         }
 
         private void AddRecurse(T newEntry, SeanNode<T> node)
         {
             if (newEntry.CompareTo(node.Value) <= 0)
             {
+                node.LeftLayers++;
                 if (node.Left == null)
                 {
                     SeanNode<T> newNode = new SeanNode<T>(newEntry);
@@ -60,6 +50,7 @@ namespace SeanBST
             }
             else
             {
+                node.RightLayers++;
                 if (node.Right == null)
                 {
                     SeanNode<T> newNode = new SeanNode<T>(newEntry);
@@ -92,6 +83,35 @@ namespace SeanBST
         }
 
         /// <summary>
+        /// Returns an in-order List of the values contained in the tree.
+        /// </summary>
+        /// <returns>A List<T> of the values in the tree, in order.</returns>
+        public List<T> Traverse()
+        {
+            List<T> values = new List<T>();
+            values = TraverseNext(values, head);
+            
+            return values;
+        }
+
+        private List<T> TraverseNext(List<T> values, SeanNode<T> node)
+        {
+            if(node.Left != null)
+            {
+                values = TraverseNext(values, node.Left);
+            }
+
+            values.Add(node.Value);
+
+            if(node.Right != null)
+            {
+                values = TraverseNext(values, node.Right);
+            }
+
+            return values;
+        }
+
+        /// <summary>
         /// If the provided value exists in the tree, deletes it.
         /// Returns true if the value was found and deleted.
         /// If multiple instances of the value exist, only the first value found will be deleted.
@@ -109,7 +129,7 @@ namespace SeanBST
             {
                 head = null;
                 valueDeleted = true;
-                size--;
+                Size--;
             }
             else //If the head has children, we must search out the desired value, delete it, and move the children
             {
@@ -122,13 +142,10 @@ namespace SeanBST
                 {
                     DeleteNode(nodeToDelete);
                     valueDeleted = true;
-                    size--;
+                    Size--;
                 }
 
             }
-
-
-
             return valueDeleted;
         }
 
@@ -260,14 +277,14 @@ namespace SeanBST
             return returnVal;
         }
 
-        private void Sort()
+        public void TESTFUNCTION()
         {
-            //sort option 1: read all values into an array. Sort array. Make head a new node. Build new tree using array values.
+            Rebalance();
+        }
 
-            //sort option 2: 
-
-
-
+        private void Rebalance()
+        {
+            
 
         }
 
