@@ -43,10 +43,10 @@ namespace SeanBST
             valueFound = tree.Exists(8);
 
             
-            bool valueDeleted = tree.Delete(15);
-            valueDeleted = tree.Delete(5);
-            valueDeleted = tree.Delete(9);
-            valueDeleted = tree.Delete(4);
+            tree.Delete(15);
+            tree.Delete(5);
+            tree.Delete(9);
+            tree.Delete(4);
             
 
             List<int> treeValues = tree.Traverse();

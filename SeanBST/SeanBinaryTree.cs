@@ -36,47 +36,86 @@ namespace SeanBST
         {
             if (newEntry.CompareTo(node.Value) <= 0)
             {
-                if (node.Left == null)
-                {
-                    SeanNode<T> newNode = new SeanNode<T>(newEntry);
-                    node.Left = newNode;
-                    node.Left.Parent = node;
-                    node.LeftLayers++;
-                }
-                else
-                {
-                    AddRecurse(newEntry, node.Left);
-                }
-
-                if (node.Left.LeftLayers == node.LeftLayers || node.Left.RightLayers == node.LeftLayers)
-                {
-                    node.LeftLayers++;
-                }
+                AddLeft(newEntry, node);   
             }
             else
             {
-                if (node.Right == null)
-                {
-                    SeanNode<T> newNode = new SeanNode<T>(newEntry);
-                    node.Right = newNode;
-                    node.Right.Parent = node;
-                    node.RightLayers++;
-                }
-                else
-                {
-                    AddRecurse(newEntry, node.Right);
-                }
-
-                if(node.Right.RightLayers == node.RightLayers || node.Right.LeftLayers == node.RightLayers)
-                {
-                    node.RightLayers++;
-                }
+                AddRight(newEntry, node);   
             }
 
             if (Math.Abs(node.LeftLayers - node.RightLayers) > 1)
             {
                 Rebalance(node);
             }
+        }
+
+        private void AddLeft(T newEntry, SeanNode<T> node)
+        {
+            if (node.Left == null)
+            {
+                SeanNode<T> newNode = new SeanNode<T>(newEntry);
+                node.Left = newNode;
+                node.Left.Parent = node;
+                node.LeftLayers++;
+            }
+            else
+            {
+                AddRecurse(newEntry, node.Left);
+            }
+
+            if (node.Left.LeftLayers == node.LeftLayers || node.Left.RightLayers == node.LeftLayers)
+            {
+                node.LeftLayers++;
+            }
+        }
+
+        private void AddRight(T newEntry, SeanNode<T> node)
+        {
+            if (node.Right == null)
+            {
+                SeanNode<T> newNode = new SeanNode<T>(newEntry);
+                node.Right = newNode;
+                node.Right.Parent = node;
+                node.RightLayers++;
+            }
+            else
+            {
+                AddRecurse(newEntry, node.Right);
+            }
+
+            if (node.Right.RightLayers == node.RightLayers || node.Right.LeftLayers == node.RightLayers)
+            {
+                node.RightLayers++;
+            }
+        }
+
+        /// <summary>
+        /// Returns an in-order List of the values contained in the tree.
+        /// </summary>
+        /// <returns>A List<T> of the values in the tree, in order.</returns>
+        public List<T> Traverse()
+        {
+            List<T> values = new List<T>();
+            values = BuildTraversalList(values, head);
+
+            return values;
+        }
+
+        private List<T> BuildTraversalList(List<T> values, SeanNode<T> node)
+        {
+            if (node.Left != null)
+            {
+                values = BuildTraversalList(values, node.Left);
+            }
+
+            values.Add(node.Value);
+
+            if (node.Right != null)
+            {
+                values = BuildTraversalList(values, node.Right);
+            }
+
+            return values;
         }
 
         /// <summary>
@@ -98,70 +137,34 @@ namespace SeanBST
         }
 
         /// <summary>
-        /// Returns an in-order List of the values contained in the tree.
-        /// </summary>
-        /// <returns>A List<T> of the values in the tree, in order.</returns>
-        public List<T> Traverse()
-        {
-            List<T> values = new List<T>();
-            values = TraverseNext(values, head);
-            
-            return values;
-        }
-
-        private List<T> TraverseNext(List<T> values, SeanNode<T> node)
-        {
-            if(node.Left != null)
-            {
-                values = TraverseNext(values, node.Left);
-            }
-
-            values.Add(node.Value);
-
-            if(node.Right != null)
-            {
-                values = TraverseNext(values, node.Right);
-            }
-
-            return values;
-        }
-
-        /// <summary>
         /// If the provided value exists in the tree, deletes it.
         /// Returns true if the value was found and deleted.
         /// If multiple instances of the value exist, only the first value found will be deleted.
         /// </summary>
         /// <param name="valueToDelete">The value you want to delete from the tree.</param>
         /// <returns>Whether the value was found and deleted or not.</returns>
-        public bool Delete(T valueToDelete)
+        public void Delete(T valueToDelete)
         {
-            bool valueDeleted = false;
             if (head == null) //If there's no head, there's nothing to delete.
             {
-                return false;
+                return;
             }
             else if (head.Left == null && head.Right == null) //If the head has no children, we can just delete it.
             {
                 head = null;
-                valueDeleted = true;
                 Size--;
             }
             else //If the head has children, we must search out the desired value, delete it, and move the children
             {
                 SeanNode<T> nodeToDelete = GetNode(valueToDelete, head);
-                if (nodeToDelete == null)
-                {
-                    valueDeleted = false;
-                }
-                else
+                if (nodeToDelete != null)
                 {
                     DeleteNode(nodeToDelete);
-                    valueDeleted = true;
                     Size--;
                 }
-
             }
-            return valueDeleted;
+
+            return;
         }
 
         /// <summary>
@@ -184,7 +187,6 @@ namespace SeanBST
                 {
                     nodeToReturn = GetNode(valueToGet, currentNode.Left);
                 }
-
             }
             else
             {
@@ -294,7 +296,6 @@ namespace SeanBST
                 currentNode.Parent.Right = null;
             }
             
-
             return returnVal;
         }
 
@@ -336,7 +337,6 @@ namespace SeanBST
                 DeleteNodeReverse(node);
                 AddRecurse(valueToMove, head);
             }
-
         }
 
         private void DeleteNodeReverse(SeanNode<T> node)    //This is, unfortunately, the same as DeleteNode except it calls PollReverse instead
@@ -434,6 +434,5 @@ namespace SeanBST
 
             return returnVal;
         }
-
     }
 }
